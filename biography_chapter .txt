@@ -1,0 +1,198 @@
+%=============================================================
+%  Biography Chapter – XeLaTeX  (FIXED v3 – top-third fade)
+%  Place in same folder: building.jpg  lion.png B.png
+%  Compile: xelatex biography_chapter.tex  (run twice)
+%=============================================================
+\documentclass[12pt, a4paper]{book}
+
+% ── Fonts ────────────────────────────────────────────────────
+\usepackage{fontspec}
+\setmainfont{EB Garamond}
+\usepackage{microtype}
+
+% ── Page Layout ──────────────────────────────────────────────
+\usepackage[
+  a4paper,
+  top=2.5cm, bottom=2.5cm,
+  left=2.5cm, right=2.5cm
+]{geometry}
+\pagestyle{empty}
+
+% ── Graphics & Colors ────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{eso-pic}
+
+% ── TikZ ─────────────────────────────────────────────────────
+\usepackage{tikz}
+\usetikzlibrary{fadings}
+
+% Define a custom top-to-bottom fading (opaque → transparent)
+\tikzfading[
+  name=top fade,
+  top color=transparent!0,    % fully opaque at top
+  bottom color=transparent!100 % fully transparent at bottom
+]
+
+% ── Drop Cap ─────────────────────────────────────────────────
+\usepackage{wrapfig}
+\usepackage{calc}
+\newfontface\ChorusFont{TeX Gyre Chorus}
+
+% ── Spacing ──────────────────────────────────────────────────
+\usepackage{setspace}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0pt}
+\widowpenalty=10000
+\clubpenalty=10000
+
+%=============================================================
+%  BACKGROUND: building – top third only + gradient fade
+%
+%  Strategy:
+%   1. Clip to top 1/3 of page
+%   2. Draw the image at reduced opacity (0.18)
+%   3. Overlay a white→transparent rectangle using the
+%      tikzfading so the image dissolves into white
+%=============================================================
+\newcommand{\AddBackground}{%
+  \AddToShipoutPictureBG*{%
+    \begin{tikzpicture}[remember picture, overlay]
+      % ── Step 1: image clipped to top third ──────────────────
+      \begin{scope}
+        \clip (current page.north west)
+              rectangle
+              ([yshift=-0.3333\paperheight] current page.north east);
+
+        \node[opacity=0.35, anchor=north] at (current page.north) {%
+          \includegraphics[
+            width=\paperwidth,
+            height=0.3333\paperheight,
+            keepaspectratio=false
+          ]{building.jpg}%
+        };
+      \end{scope}
+
+      % ── Step 2: gradient overlay (white fade from bottom of image) ──
+      % Covers the bottom 60% of the image region so the fade
+      % starts early and ends cleanly in white
+      \fill[white, path fading=top fade, fading angle=180]
+        (current page.north west)
+        rectangle
+        ([yshift=-0.3333\paperheight] current page.north east);
+
+    \end{tikzpicture}%
+  }%
+}
+
+%=============================================================
+%  MATH WATERMARK at top (faint formulas)
+%=============================================================
+\newcommand{\MathWatermark}{%
+  \AddToShipoutPictureBG*{%
+    \begin{tikzpicture}[remember picture, overlay]
+      \node[opacity=0.06,
+            anchor=north,
+            yshift=-1.0cm] at (current page.north) {%
+        \fontsize{16}{20}\selectfont
+        $f\,(x)\;\exp(-\,i\,\xi\,x)\;\mathrm{d}x
+        \quad t \quad 2T \quad f(\xi)$%
+      };
+    \end{tikzpicture}%
+  }%
+}
+
+%=============================================================
+%  CHAPTER ORNAMENT – small geometric square
+%=============================================================
+\newcommand{\ChapterOrnament}{%
+  \begin{center}
+    \begin{tikzpicture}[scale=0.48]
+      \draw[line width=1.2pt] (0,0) rectangle (3,3);
+      \draw[line width=0.6pt] (0.28,0.28) rectangle (2.72,2.72);
+      \draw[line width=0.45pt] (0.28,0.28) -- (2.72,2.72);
+      \draw[line width=0.45pt] (2.72,0.28) -- (0.28,2.72);
+      \filldraw[fill=black!85, draw=black] (1.5,1.5) circle (0.25);
+      \filldraw[fill=black!80] (0.28,0.28) rectangle (0.68,0.68);
+      \filldraw[fill=black!80] (2.32,0.28) rectangle (2.72,0.68);
+      \filldraw[fill=black!80] (0.28,2.32) rectangle (0.68,2.72);
+      \filldraw[fill=black!80] (2.32,2.32) rectangle (2.72,2.72);
+      \filldraw[fill=black!60] (1.5,0.28)  circle (0.10);
+      \filldraw[fill=black!60] (1.5,2.72)  circle (0.10);
+      \filldraw[fill=black!60] (0.28,1.5)  circle (0.10);
+      \filldraw[fill=black!60] (2.72,1.5)  circle (0.10);
+    \end{tikzpicture}
+  \end{center}%
+}
+
+%=============================================================
+\begin{document}
+\AddBackground
+\MathWatermark
+
+%-------------------------------------------------------------
+%  CHAPTER HEADER
+%-------------------------------------------------------------
+\vspace*{0.8cm}
+
+\begin{center}
+  {\fontsize{52}{56}\selectfont\bfseries 1}
+\end{center}
+
+\vspace{0.15cm}
+
+\noindent\makebox[\linewidth]{%
+  \raisebox{-0.5\height}{%
+    \reflectbox{\includegraphics[height=2.8cm]{lion.png}}%
+  }%
+  \hfill%
+  {\fontsize{34}{38}\selectfont\scshape Biography}%
+  \hfill%
+  \raisebox{-0.5\height}{%
+    \includegraphics[height=2.8cm]{lion.png}%
+  }%
+}
+
+\vspace{0.7cm}
+
+\begin{center}
+  \includegraphics[width=2.8cm]{square.png}
+\end{center}
+
+\vspace{0.5cm}
+
+%-------------------------------------------------------------
+%  BODY TEXT
+%-------------------------------------------------------------
+\begin{wrapfigure}{l}{1.9cm}%
+  \vspace{-\baselineskip}%
+  \includegraphics[width=1.8cm, trim=15pt 10pt 15pt 10pt, clip]{B.png}%
+  \vspace{-20pt}%
+\end{wrapfigure}%
+\noindent orn on March 21, 1768, in Auxerre, France.
+Joseph Fourier was the son of a tailor, but he would rise to prominence as one of the most
+influential mathematicians and physicists of his time. Fourier lost his parents at an early age
+and was subsequently raised by a Benedictine abbey, where he received his early education.
+Showing exceptional promise in mathematics, he pursued his studies at the École Royale Militaire
+of Auxerre.
+
+\bigskip
+\indent In 1787, Fourier began teaching mathematics at the Benedictine college in his hometown.
+His academic career was briefly interrupted by the French Revolution, during which he became
+involved in political activities. He was appointed as a commissioner for the National Convention,
+a role in which he narrowly escaped execution during the Reign of Terror.
+
+\bigskip
+\indent After the Revolution, Fourier returned to academia and continued his work in mathematics.
+He joined the newly established École Normale Supérieure in Paris in 1795, where he studied under
+renowned mathematicians such as Joseph-Louis Lagrange and Pierre-Simon Laplace.
+
+\bigskip
+\indent Fourier's most significant contribution to science came during his time in Egypt with
+Napoleon Bonaparte's expedition. Appointed as the secretary of the Institut d'Égypte, he conducted
+important research in heat transfer. This work culminated in his seminal publication,
+\textit{Théorie analytique de la chaleur} (The Analytical Theory of Heat) in 1822. In this
+treatise, Fourier introduced the concept of Fourier series, a mathematical tool that allows the
+decomposition of functions into sine and cosine components.
+
+\end{document}
