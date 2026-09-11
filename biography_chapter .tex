@@ -1,6 +1,6 @@
 %=============================================================
-%  Biography Chapter – XeLaTeX  (FIXED v3 – top-third fade)
-%  Place in same folder: building.jpg  lion.png
+%  Biography Chapter – XeLaTeX  (FIXED - Adjusted Top Background)
+%  Place in same folder: building.jpg  lion.png  square.png  B.png
 %  Compile: xelatex biography_chapter.tex  (run twice)
 %=============================================================
 \documentclass[12pt, a4paper]{book}
@@ -10,6 +10,7 @@
 \setmainfont{Libertinus Serif}
 \usepackage{microtype}
 \usepackage{amssymb}
+
 % ── Page Layout ──────────────────────────────────────────────
 \usepackage[
 a4paper,
@@ -47,13 +48,7 @@ bottom color=transparent!100 % fully transparent at bottom
 \clubpenalty=10000
 
 %=============================================================
-%  BACKGROUND: building – top third only + gradient fade
-%
-%  Strategy:
-%   1. Clip to top 1/3 of page
-%   2. Draw the image at reduced opacity (0.18)
-%   3. Overlay a white→transparent rectangle using the
-%      tikzfading so the image dissolves into white
+%  BACKGROUND: building – top third only + gradient fade (FIXED GAP)
 %=============================================================
 \newcommand{\AddBackground}{%
 	\AddToShipoutPictureBG*{%
@@ -62,24 +57,23 @@ bottom color=transparent!100 % fully transparent at bottom
 			\begin{scope}
 				\clip (current page.north west)
 				rectangle
-				([yshift=-0.3333\paperheight] current page.north east);
+				([yshift=-0.34\paperheight] current page.north east);
 				
-				\node[opacity=0.35, anchor=north] at (current page.north) {%
+				% إضافة inner sep=0pt و yshift=2mm للالتقاط بأعلى الصفحة بدون أي بياض
+				\node[opacity=0.35, anchor=north, inner sep=0pt, yshift=2mm] at (current page.north) {%
 					\includegraphics[
 					width=\paperwidth,
-					height=0.3333\paperheight,
+					height=0.35\paperheight,
 					keepaspectratio=false
 					]{building.jpg}%
 				};
 			\end{scope}
 			
 			% ── Step 2: gradient overlay (white fade from bottom of image) ──
-			% Covers the bottom 60% of the image region so the fade
-			% starts early and ends cleanly in white
 			\fill[white, path fading=top fade, fading angle=180]
 			(current page.north west)
 			rectangle
-			([yshift=-0.3333\paperheight] current page.north east);
+			([yshift=-0.34\paperheight] current page.north east);
 			
 		\end{tikzpicture}%
 	}%
